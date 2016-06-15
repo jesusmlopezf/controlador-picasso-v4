@@ -1,0 +1,80 @@
+#include <Servo.h>
+
+String inputString = "";
+boolean stringComplete = false;
+
+int pwm1 = 7;
+int pwm2 = 6;
+int pwm3 = 5;
+int pwm4 = 4;
+
+int out1 = 512;
+int out2 = 512;
+int out3 = 512;
+int out4 = 512;
+
+Servo servo1;
+Servo servo2;
+Servo servo3;
+Servo servo4;
+
+void setup() {
+  // initialize serial:
+  Serial.begin(9600);
+
+  servo1.attach(pwm1);
+  servo2.attach(pwm2);
+  servo3.attach(pwm3);
+  servo4.attach(pwm4);
+
+  inputString.reserve(200);
+}
+
+void loop() {
+  serialEvent();
+  
+  if (stringComplete) {
+    Serial.println(inputString);
+    
+    if(inputString.charAt(0)=='A'){
+      out1=inputString.substring(1).toInt();
+      out1=map(out1, 0, 1023, 0, 180);
+    }
+    if(inputString.charAt(0)=='B'){
+      out2=inputString.substring(1).toInt();
+      out2=map(out2, 0, 1023, 0, 180);
+    }
+    if(inputString.charAt(0)=='C'){
+      out3=inputString.substring(1).toInt();
+      out3=map(out3, 0, 1023, 0, 180);
+    }
+    if(inputString.charAt(0)=='D'){
+      out4=inputString.substring(1).toInt();
+      out4=map(out4, 0, 1023, 0, 180);
+    }        
+    inputString = "";
+    stringComplete = false;
+  }
+  servo1.write(out1);
+  servo2.write(out2);
+  servo3.write(out3);
+  servo4.write(out4);
+  delay(15);
+}
+
+void serialEvent() {
+  while (Serial.available()) {
+    // get the new byte:
+    char inChar = (char)Serial.read();
+    // add it to the inputString:
+    
+    // if the incoming character is a newline, set a flag
+    // so the main loop can do something about it:
+    if (inChar == ' ') {
+      stringComplete = true;
+    } else { 
+      inputString += inChar;
+    }
+  }
+}
+
